@@ -1,0 +1,22 @@
+{
+    "name": "proyecciones-rentabilidades-futuros",
+    "version": "1.0.0",
+    "description": "Agrega y muestra las proyecciones futuros a largo, corto plazo lineales y no lineales y las rentabilidades futuros a largo y corto plazo",
+    "keywords": [],
+    "author": "Manuel Pereira",
+    "license": "ISC",
+    "dependencies": {
+        "aws-serverless-express": "^3.4.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "googleapis": "^113.0.0",
+        "mysql": "^2.18.1",
+        "mysql2": "^3.2.0"
+    },
+    "devDependencies": {
+        "serverless-offline": "^12.0.4",
+        "serverless-plugin-common-excludes": "^4.0.0",
+        "serverless-plugin-include-dependencies": "^5.0.0"
+    }
+}

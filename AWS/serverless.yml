@@ -1,0 +1,179 @@
+service: proy-rent-futuros
+useDotenv: true
+
+package:
+  individually: true
+  excludeDevDependencies: false
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: us-east-2
+  stage: prod
+  environment:
+    DB_HOST: ${env:DB_HOST}
+    DB_USER: ${env:DB_USER}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    DB_PORT: ${env:DB_PORT}
+    DB_DATABASE: ${env:DB_DATABASE}
+    
+functions:
+  agregarRentabilidadesCPFuturos:
+    handler: rentabilidades.handler
+    memorySize: 1024
+    name: agregar-datos-rent-cp-futuros
+    description: LCF22 - Guarda las Rentabilidades a Corto Plazo Futuros desde Google Spreadsheet a la base de Datos.
+    timeout: 300
+    maximumRetryAttempts: 0
+    package:
+      patterns:
+        - "!proyeccionesCPFutLineal/**"
+        - "!proyeccionesCPFutNoLineal/**"
+        - "!rentabilidadesCPFut/**"
+        - "!proyeccionModel.js"
+    environment:
+      ID_HOJA_RENT_CP: ${env:ID_HOJA_RENT_CP}
+      TABLE_CRIPTO_RENT_CP: ${env:TABLE_CRIPTO_RENT_CP}
+      SPREADSHEET_ID: ${env:SPREADSHEET_ID}
+    events:
+      - eventBridge:
+          schedule: cron(0 12-3/1 * * ? *)
+  agregarProyCPFuturos:
+    handler: index.handler
+    memorySize: 1024
+    name: agregar-proy-cp-lineal-futuros
+    description: LCF23 - Guarda las Proyecciones a Corto Plazo Futuros desde Google Spreadsheet a la base de Datos.
+    timeout: 300
+    maximumRetryAttempts: 0
+    package:
+      patterns:
+        - "!proyeccionesCPFutLineal/**"
+        - "!proyeccionesCPFutNoLineal/**"
+        - "!rentabilidadesCPFut/**"
+        - "!rentabilidadcpModel.js"
+        - "!rentabilidades.js"
+    environment:
+      ID_HOJA_PROY: ${env:ID_HOJA_PROY_CP}
+      TABLE_CRIPTO_PROY: ${env:TABLE_CRIPTO_PROY_CP}
+      SPREADSHEET_ID: ${env:SPREADSHEET_ID}
+    events:
+      - eventBridge:
+          schedule: cron(0 12-3/1 * * ? *)
+  agregarProyCPNoLinealFuturos:
+    handler: index.handler
+    memorySize: 1024
+    name: agregar-proy-cp-nolineal-futuros
+    description: LCF24 - Guarda las Proyecciones a Corto Plazo No Lineales Futuros desde Google Spreadsheet a la base de Datos.
+    timeout: 300
+    maximumRetryAttempts: 0
+    package:
+      patterns:
+        - "!proyeccionesCPFutLineal/**"
+        - "!proyeccionesCPFutNoLineal/**"
+        - "!rentabilidadesCPFut/**"
+        - "!rentabilidadcpModel.js"
+        - "!rentabilidades.js"
+    environment:
+      ID_HOJA_PROY: ${env:ID_HOJA_PROY_CP_NOLINEAL}
+      TABLE_CRIPTO_PROY: ${env:TABLE_CRIPTO_PROY_CP_NOLINEAL}
+      SPREADSHEET_ID: ${env:SPREADSHEET_ID}
+    events:
+      - eventBridge:
+          schedule: cron(0 12-3/1 * * ? *)
+  rentabilidadesCPFutGraf:
+    handler: rentabilidadesCPFut/server.rentabilidadesCPFut
+    name: rentabilidadesCPFutGraf
+    description: LCG9 - Obtiene el gráfico de Rentabilidad a corto plazo futuros de Criptos desde los datos de AWS RDS.
+    environment:
+      TABLE_CRIPTO_RENT_CP: ${env:TABLE_CRIPTO_RENT_CP}
+    package:
+      patterns:
+        - "!proyeccionesCPFutLineal/**"
+        - "!proyeccionesCPFutNoLineal/**"
+        - "!credentials.json"
+        - "!index.js"
+        - "!proyeccionModel.js"
+        - "!rentabilidadcpModel.js"
+        - "!rentabilidades.js"
+        - "rentabilidadesCPFut/**"
+    events:
+      - http:
+          method: GET
+          path: rent/cp/futuros
+      - http:
+          method: GET
+          path: rent/cp/futuros/grafico/{cripto}
+      - http: 
+          method: GET
+          path: rent/cp/futuros/graficos/grafico/{cripto}
+      - http:
+          method: GET
+          path: rent/cp/futuros/js/grafico.js
+  proyeccionesCPFutLinealGraf:
+    handler: proyeccionesCPFutLineal/server.proyeccionesCPFutLineal
+    name: proyeccionesCPFutLinealGraf
+    description: LCG10 - Obtiene el gráfico de Proyecciones Lineal Futuros a corto plazo de Criptos desde los datos de AWS RDS.
+    environment:
+      TABLE_CRIPTO_PROY: ${env:TABLE_CRIPTO_PROY_CP}
+    package:
+      patterns:
+        - "!proyeccionesCPFutNoLineal/**"
+        - "!rentabilidadesCPFut/**"
+        - "!credentials.json"
+        - "!index.js"
+        - "!rentabilidades.js"
+        - "!rentabilidadcpModel.js"
+        - "!proyeccionModel.js"
+        - "proyeccionesCPFutLineal/**"
+    events:
+      - http:
+          method: GET
+          path: proy/cp/lineal/futuros
+      - http:
+          method: GET
+          path: proy/cp/lineal/futuros/grafico/{cripto}
+      - http: 
+          method: GET
+          path: proy/cp/lineal/futuros/graficos/grafico/{cripto}
+      - http:
+          method: GET
+          path: proy/cp/lineal/futuros/js/grafico.js
+  proyeccionesCPFutNoLinealGraf:
+    handler: proyeccionesCPFutNoLineal/server.proyeccionesCPFutNoLineal
+    name: proyeccionesCPFutNoLinealGraf
+    description: LCG11 - Obtiene el gráfico de Proyecciones No Lineal Futuros a corto plazo de Criptos desde los datos de AWS RDS.
+    environment:
+      TABLE_CRIPTO_PROY: ${env:TABLE_CRIPTO_PROY_CP_NOLINEAL}
+    package:
+      patterns:
+        - "!rentabilidadesCPFut/**"
+        - "!proyeccionesCPFutLineal/**"
+        - "!credentials.json"
+        - "!index.js"
+        - "!proyeccionModel.js"
+        - "!rentabilidades.js"
+        - "!rentabilidadcpModel.js"
+        - "proyeccionesCPFutNoLineal/**"
+    events:
+      - http:
+          method: GET
+          path: proy/cp/nolineal/futuros
+      - http:
+          method: GET
+          path: proy/cp/nolineal/futuros/grafico/{cripto}
+      - http: 
+          method: GET
+          path: proy/cp/nolineal/futuros/graficos/grafico/{cripto}
+      - http:
+          method: GET
+          path: proy/cp/nolineal/futuros/js/grafico.js
+
+plugins:
+  - serverless-plugin-common-excludes
+  - serverless-plugin-include-dependencies
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    lambdaPort: 3001

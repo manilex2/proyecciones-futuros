@@ -1,0 +1,23 @@
+{
+  "name": "proyecciones-rentabilidades-futuros",
+  "version": "1.0.0",
+  "description": "Agrega y muestra las proyecciones futuros a largo, corto plazo lineales y no lineales y las rentabilidades futuros a largo y corto plazo",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon rentabilidadesCPFut/app.js"
+  },
+  "author": "Manuel Pereira",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "googleapis": "^113.0.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.2.0"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.21"
+  }
+}
